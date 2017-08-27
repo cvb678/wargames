@@ -1,0 +1,10 @@
+This level requires you to find a Set User ID program that will run as the “flag00” account.
+
+> find flag00 / 2>/dev/null | grep flag00
+/rofs/bin/.../flag00
+
+> cd /rofs/bin/.../
+> ./flag00
+Now execute getflag
+> getflag
+You have succesfully executed getflag on a target account

