@@ -27,7 +27,7 @@ int main(int argc, char **argv, char **envp)
   system(buffer);
 }
 
-Now /bin/echo is being called, so we cannot use same trick as in level01. But we can control $USER variable in our env. It means that there is a format string vulnerability.
+Now /bin/echo is being called, so we cannot use the same trick as in level01. But we can control $USER variable in our env. It means that there is a format string vulnerability that allows to inject more than just a parameter for echo.
 
 To execute multiple commands use system("command1; command2; command3");
 

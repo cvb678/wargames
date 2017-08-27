@@ -1,7 +1,17 @@
-Old credentials
-cat /etc/passwd | grep flag06
-ueqwOCnSGdsuM
-crack
-hello :)
-ssh
-getflag
+The flag06 account credentials came from a legacy unix system.
+
+This description doesn't really say much, but first thing that came to my head was checking /etc/passwd file, since passwords to accounts were stored there in older systems.
+> cat /etc/passwd
+We can see a lot of accounts with x as their passwords, but if we try grepping for specific account:
+> cat /etc/passwd | grep flag06 
+flag06:ueqwOCnSGdsuM:...
+
+So this is our password, but encrypted. Since it's from a legacy system, it's probably encrypted with legacy algorithm, like DES.
+We can crack this password using for example John the Ripper.
+The password is: hello
+
+Now we can log into machine:
+> login: flag06
+> password: hello
+> getflag
+You have successfully executed getflag on a target account.

