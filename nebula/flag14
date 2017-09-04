@@ -1,0 +1,37 @@
+This program resides in /home/flag14/flag14. It encrypts input and writes it to standard output. An encrypted token file is also in that home directory, decrypt it :)
+
+In /home/flag14 there are two files:
+ - flag14 executable
+ - token with encrypted token
+
+First, let's find out how does flag14 file work. Couple of inputs and outputs:
+in:  abcdefgh
+out: acegikmo
+
+in:  123456789
+out: 13579;=?A
+
+At first glance it seems that it's a pretty simple encryption. For each character in input program takes it ASCII code and adds number starting from 0, incremented by one each character.
+To decrypt we just have to substract corresponding values from token.
+
+Encrypted: 857:g67?5ABBo:BtDA?tIvLDKL{MQPSRQWW.
+
+To not do it manually, let's create a short python script.
+
+enc = "857:g67?5ABBo:BtDA?tIvLDKL{MQPSRQWW."
+count = 0
+dec = ""
+
+for c in enc:
+  dec += chr(ord(c)-count)
+  count+=1
+
+print dec
+
+Printed dec value is: 8457c118-887c-4e40-a5a6-33a25353165
+
+Now log in on vm:
+> login: flag14
+> password: 8457c118-887c-4e40-a5a6-33a25353165
+> getflag
+You have successfully executed getflag on a target account.

